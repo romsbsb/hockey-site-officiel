@@ -54,13 +54,12 @@ try {
     $reqVotesActuels->execute([$match_actuel['id_match']]);
     $decompte_votes = $reqVotesActuels->fetchAll(PDO::FETCH_KEY_PAIR); // Donne un tableau [id_joueur => nombre_de_votes]
 
-    // 5. Statut des votes (Ouverts entre 10h et 17h le jour du match)
+    // 5. Statut des votes (Ouverts si le match est en cours ou terminé)
     $votes_ouverts = false;
-    $heure_h = $maintenant->format('H:i');
-    if ($match_actuel['date_match'] == $maintenant->format('Y-m-d') && $match_actuel['statut'] != 'Clôturé') {
-        if ($heure_h >= "10:00" && $heure_h <= "17:00") {
-            $votes_ouverts = true;
-        }
+    
+    // On ouvre les votes si le match est commencé ou fini
+    if ($match_actuel['statut'] == 'En cours' || $match_actuel['statut'] == 'Clôturé') {
+        $votes_ouverts = true;
     }
 
     // 6. Récupération des votes MOTM pour ce match précis
