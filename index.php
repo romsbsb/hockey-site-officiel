@@ -8,6 +8,11 @@ $mot_de_passe = getenv('PGPASSWORD') ?: "hockey123";
 $nom_base = getenv('PGDATABASE') ?: "Hockey";
 
 try {
+    // Compter les votes MOTM pour le match en cours
+    $reqVotesActuels = $ConnexionBDD->prepare("SELECT id_joueur, COUNT(*) as nb_votes FROM Votes WHERE id_match = ? AND note IS NULL GROUP BY id_joueur");
+    $reqVotesActuels->execute([$match_actuel['id_match']]);
+    $decompte_votes = $reqVotesActuels->fetchAll(PDO::FETCH_KEY_PAIR); // Donne un tableau [id_joueur => nombre_de_votes]
+
     $dsn = "pgsql:host=$serveur;port=$port;dbname=$nom_base";
     $ConnexionBDD = new PDO($dsn, $utilisateur, $mot_de_passe);
     $ConnexionBDD->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -248,32 +253,33 @@ try {
     </div>
 
     <div class="panneau-motm">
-        <h3>🏆 VOTE MOTM</h3>
-        
-        <?php if ($votes_ouverts): ?>
-            <select id="select-motm" style="width:100%; padding:8px;">
-                <option value="">-- Choisir --</option>
-                <?php foreach($tous_les_joueurs as $j): ?>
-                    <option value="<?= $j['id_joueur'] ?>"><?= htmlspecialchars($j['prenom'] . ' ' . $j['nom']) ?></option>
-                <?php endforeach; ?>
-            </select>
-            <button class="btn-motm" onclick="validerMOTM()">VOTER POUR LE MOTM</button>
-        <?php else: ?>
-            <p style="color: #e74c3c; font-size: 0.9rem; margin-bottom: 15px;">Les votes sont fermés.</p>
-            <?php if ($motm_declare): ?>
-                <p style="color: #FFD700; font-weight: bold; font-size: 0.9rem;">Le gagnant a été désigné !</p>
-            <?php endif; ?>
-        <?php endif; ?>
-        
-        <div style="margin-top:20px; text-align: left; font-size: 0.8rem;">
-            <h4 style="border-bottom: 1px solid #444;">📜 Hall of Fame</h4>
-            <?php foreach(array_slice($hall_of_fame, 0, 5) as $h): ?>
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <span><?= htmlspecialchars($h['prenom']) ?></span>
-                    <span style="color:#FFD700;">★ <?= $h['total_motm'] ?></span>
-                </div>
-            <?php endforeach; ?>
-        </div>
+    <h3>🏆 VOTE MOTM</h3>
+    
+    <select id="select-motm" style="width:100%; padding:8px;" <?= !$votes_ouverts ? 'disabled' : '' ?>>
+        <option value="">-- Choisir --</option>
+        <?php foreach($tous_les_joueurs as $j): ?>
+            <?php 
+                // Récupère le nombre de votes ou met 0 par défaut
+                $nb = isset($decompte_votes[$j['id_joueur']]) ? $decompte_votes[$j['id_joueur']] : 0; 
+            ?>
+            <option value="<?= $j['id_joueur'] ?>">
+                <?= htmlspecialchars($j['prenom'] . ' ' . $j['nom']) ?> (nb votes : <?= $nb ?>)
+            </option>
+        <?php endforeach; ?>
+    </select>
+    
+    <button class="btn-motm" onclick="validerMOTM()" <?= !$votes_ouverts ? 'disabled style="background:#555; cursor:not-allowed;"' : '' ?>>
+        <?= $votes_ouverts ? 'VOTER POUR LE MOTM' : 'VOTES FERMÉS' ?>
+    </button>
+    
+    <div style="margin-top:20px; text-align: left; font-size: 0.8rem;">
+        <h4 style="border-bottom: 1px solid #444;">📜 Hall of Fame</h4>
+        <?php foreach(array_slice($hall_of_fame, 0, 5) as $h): ?>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                <span><?= htmlspecialchars($h['prenom']) ?></span>
+                <span style="color:#FFD700;">★ <?= $h['total_motm'] ?></span>
+            </div>
+        <?php endforeach; ?>
     </div>
 </div>
 
