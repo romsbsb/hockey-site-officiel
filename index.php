@@ -131,6 +131,29 @@ try {
 
         .banc { background: #2a2a2a; width: 120px; border: 2px dashed #555; border-radius: 10px; padding: 10px; }
         .panneau-motm { background: #2a2a2a; width: 220px; padding: 15px; border-radius: 10px; border: 2px solid #FFD700; }
+        .star-rating {
+    display: inline-block;
+    font-size: 0.8rem; /* Taille des étoiles */
+    color: #555; /* Couleur des étoiles vides (gris) */
+    position: relative;
+    margin-top: 3px;
+}
+.star-rating::before {
+    content: '★★★★★';
+    letter-spacing: 1px;
+}
+.star-rating-fill {
+    color: #FFD700; /* Couleur des étoiles pleines (or) */
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.star-rating-fill::before {
+    content: '★★★★★';
+    letter-spacing: 1px;
+}
         
         .ligne-joueurs { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; z-index: 2; }
         /* Ajout d'une marge en bas pour laisser la place aux badges de votes */
@@ -207,6 +230,15 @@ try {
                     </div>
                     <div class="player-name"><?= htmlspecialchars($j['prenom']) ?></div>
 
+<?php if (isset($moyennes[$j['id_joueur']])): 
+    // On calcule le pourcentage de remplissage (ex: 4.2 / 5 * 100 = 84%)
+    $pourcentage_etoiles = ($moyennes[$j['id_joueur']] / 5) * 100;
+?>
+    <div class="star-rating" title="Moyenne : <?= $moyennes[$j['id_joueur']] ?>/5">
+        <div class="star-rating-fill" style="width: <?= $pourcentage_etoiles ?>%;"></div>
+    </div>
+<?php endif; ?>
+
                     <?php 
                     $nb_votes = $votes_motm_match[$j['id_joueur']] ?? 0;
                     if ($motm_declare && $nb_votes > 0 && $nb_votes == $max_votes): ?>
@@ -241,6 +273,15 @@ try {
                             <?php else: ?>👤<?php endif; ?>
                         </div>
                         <div class="player-name"><?= htmlspecialchars($j['prenom']) ?></div>
+
+<?php if (isset($moyennes[$j['id_joueur']])): 
+    // On calcule le pourcentage de remplissage (ex: 4.2 / 5 * 100 = 84%)
+    $pourcentage_etoiles = ($moyennes[$j['id_joueur']] / 5) * 100;
+?>
+    <div class="star-rating" title="Moyenne : <?= $moyennes[$j['id_joueur']] ?>/5">
+        <div class="star-rating-fill" style="width: <?= $pourcentage_etoiles ?>%;"></div>
+    </div>
+<?php endif; ?>
 
                         <?php 
                         $nb_votes = $votes_motm_match[$j['id_joueur']] ?? 0;
