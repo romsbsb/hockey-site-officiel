@@ -156,6 +156,11 @@ try {
 
         .btn-motm { background: #FFD700; color: black; border: none; padding: 10px; width: 100%; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
         .btn-motm:disabled { background: #555; color: #888; cursor: not-allowed; }
+        
+        /* Style pour le bouton Modifier */
+        .btn-modifier { background: #17a2b8; color: white; border: 1px solid #117a8b; margin-top: 5px; }
+        .btn-modifier:disabled { background: #555; color: #888; border: none; }
+
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
         .modal-content { background: #222; margin: 15% auto; padding: 20px; border-radius: 10px; width: 280px; }
         .stars { color: #555; font-size: 2rem; cursor: pointer; margin: 10px 0; }
@@ -271,6 +276,10 @@ try {
     <button class="btn-motm" onclick="validerMOTM()" <?= !$votes_ouverts ? 'disabled style="background:#555; cursor:not-allowed;"' : '' ?>>
         <?= $votes_ouverts ? 'VOTER POUR LE MOTM' : 'VOTES FERMÉS' ?>
     </button>
+
+    <button class="btn-motm btn-modifier" onclick="modifierMOTM()" <?= !$votes_ouverts ? 'disabled style="background:#555; cursor:not-allowed;"' : '' ?>>
+        <?= $votes_ouverts ? 'MODIFIER MON VOTE' : 'VOTES FERMÉS' ?>
+    </button>
     
     <div style="margin-top:20px; text-align: left; font-size: 0.8rem;">
         <h4 style="border-bottom: 1px solid #444;">📜 Hall of Fame</h4>
@@ -340,6 +349,14 @@ function validerMOTM() {
     const id = document.getElementById('select-motm').value;
     if(!id) { alert("Choisis un joueur !"); return; }
     envoyerAction(id, "vote_motm");
+}
+
+// NOUVELLE FONCTION : Modifier le MOTM
+function modifierMOTM() {
+    if (!votesOuverts) { alert("Les votes pour le MOTM sont fermés."); return; }
+    const id = document.getElementById('select-motm').value;
+    if(!id) { alert("Choisis le nouveau joueur pour lequel tu souhaites voter !"); return; }
+    envoyerAction(id, "modifier_motm");
 }
 
 function envoyerAction(idJ, action, note = null, commentaire = "") {

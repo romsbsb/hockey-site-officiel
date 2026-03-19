@@ -54,9 +54,10 @@ try {
         exit;
     }
 
-    // --- LOGIQUE DE MODIFICATION DES VOTES ---
+    // --- LOGIQUE DE VOTE ET DE MODIFICATION DES VOTES ---
 
-    if ($action === "vote_motm") {
+    // On accepte les deux actions puisqu'elles font la même chose : vérifier et insérer ou mettre à jour
+    if ($action === "vote_motm" || $action === "modifier_motm") {
         // 1. On cherche si l'utilisateur a déjà voté pour le MOTM de ce match
         $check = $ConnexionBDD->prepare("SELECT id_vote FROM Votes WHERE id_match = ? AND ip_votant = ? AND note IS NULL");
         $check->execute([$id_match, $ip_votant]);
