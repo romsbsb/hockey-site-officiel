@@ -57,7 +57,7 @@ try {
     // 5. Statut des votes (Ouverts entre 10h et 17h le jour du match)
     $votes_ouverts = false;
     $heure_h = $maintenant->format('H:i');
-    if ($match_actuel['date_match'] == $maintenant->format('Y-m-d') && $match_actuel['statut'] != 'Clôturé') {
+    if ($match_actuel['statut'] != 'En cours') {
         if ($heure_h >= "10:00" && $heure_h <= "17:00") {
             $votes_ouverts = true;
         }
