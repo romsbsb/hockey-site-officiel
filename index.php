@@ -8,16 +8,12 @@ $mot_de_passe = getenv('PGPASSWORD') ?: "hockey123";
 $nom_base = getenv('PGDATABASE') ?: "Hockey";
 
 try {
-    // Compter les votes MOTM pour le match en cours
-    $reqVotesActuels = $ConnexionBDD->prepare("SELECT id_joueur, COUNT(*) as nb_votes FROM Votes WHERE id_match = ? AND note IS NULL GROUP BY id_joueur");
-    $reqVotesActuels->execute([$match_actuel['id_match']]);
-    $decompte_votes = $reqVotesActuels->fetchAll(PDO::FETCH_KEY_PAIR); // Donne un tableau [id_joueur => nombre_de_votes]
-
+    // 1. D'ABORD : On crée la connexion à la base de données
     $dsn = "pgsql:host=$serveur;port=$port;dbname=$nom_base";
     $ConnexionBDD = new PDO($dsn, $utilisateur, $mot_de_passe);
     $ConnexionBDD->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // 1. Récupération des matchs
+    // 2. Ensuite : Récupération de tous les matchs
     $reqMatchs = $ConnexionBDD->query("SELECT id_match, adversaire, statut, date_match, heure_match FROM Matchs ORDER BY date_match DESC");
     $liste_matchs = $reqMatchs->fetchAll(PDO::FETCH_ASSOC);
 
@@ -39,7 +35,7 @@ try {
     }
     unset($m); // Sécurité PHP
 
-    // 2. Sélection du match à afficher (URL ou Aujourd'hui)
+    // 3. Sélection du match actuel (URL ou Aujourd'hui)
     if (isset($_GET['id_match'])) {
         $id_req = (int)$_GET['id_match'];
         foreach($liste_matchs as $m) {
@@ -53,25 +49,29 @@ try {
     }
     if (!$match_actuel) { $match_actuel = $liste_matchs[0]; }
 
-    // 3. Statut des votes (Ouverts entre 10h et 17h le jour du match, si non clôturé)
+    // 4. MAINTENANT : On peut compter les votes car on est connecté et on a le match actuel !
+    $reqVotesActuels = $ConnexionBDD->prepare("SELECT id_joueur, COUNT(*) as nb_votes FROM Votes WHERE id_match = ? AND note IS NULL GROUP BY id_joueur");
+    $reqVotesActuels->execute([$match_actuel['id_match']]);
+    $decompte_votes = $reqVotesActuels->fetchAll(PDO::FETCH_KEY_PAIR); // Donne un tableau [id_joueur => nombre_de_votes]
+
+    // 5. Statut des votes (Ouverts entre 10h et 17h le jour du match)
     $votes_ouverts = false;
     $heure_h = $maintenant->format('H:i');
     if ($match_actuel['date_match'] == $maintenant->format('Y-m-d') && $match_actuel['statut'] != 'Clôturé') {
-        if ($heure_h >= "10:00" && $heure_h <= "16:00") {
+        if ($heure_h >= "10:00" && $heure_h <= "17:00") {
             $votes_ouverts = true;
         }
     }
 
-    // 4. Récupération des votes MOTM pour ce match précis
-    // /!\ Modifie "Votes_MOTM" si ta table s'appelle autrement
+    // 6. Récupération des votes MOTM pour ce match précis
     $reqMotm = $ConnexionBDD->prepare("SELECT id_joueur, COUNT(*) as nb_votes FROM Votes_MOTM WHERE id_match = ? GROUP BY id_joueur");
     $reqMotm->execute([$match_actuel['id_match']]);
-    $votes_motm_match = $reqMotm->fetchAll(PDO::FETCH_KEY_PAIR); // Tableau [id_joueur => nb_votes]
+    $votes_motm_match = $reqMotm->fetchAll(PDO::FETCH_KEY_PAIR);
 
     $max_votes = !empty($votes_motm_match) ? max($votes_motm_match) : 0;
     $motm_declare = ($match_actuel['statut'] == 'Clôturé' && $max_votes > 0);
 
-    // 5. Données joueurs
+    // 7. Données joueurs
     $req = $ConnexionBDD->query("SELECT * FROM Joueurs ORDER BY numero ASC");
     $tous_les_joueurs = $req->fetchAll(PDO::FETCH_ASSOC);
 
