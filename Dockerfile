@@ -1,10 +1,15 @@
 # 1. Utiliser une image officielle PHP avec Apache
 FROM php:8.2-apache
 
+# 1.5 CORRECTION MPM : Forcer l'utilisation de mpm_prefork (requis par mod_php)
+# Le "|| true" empêche le build Docker de s'interrompre si un module est déjà désactivé
+RUN a2dismod mpm_event mpm_worker || true \
+    && a2enmod mpm_prefork
+
 # 2. Installer les dépendances système pour PostgreSQL
 RUN apt-get update && apt-get install -y libpq-dev
 
-# 3. Installer les extensions PHP pour la base de données
+
 RUN docker-php-ext-install pdo pdo_pgsql pgsql
 
 # 4. Activer le module de réécriture d'Apache (pratique pour les URL)
