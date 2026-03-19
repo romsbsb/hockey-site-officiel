@@ -43,10 +43,9 @@ try {
     $date_actuelle = $maintenant->format('Y-m-d');
 
     $votes_ouverts = false;
-    if ($match['date_match'] == $date_actuelle && $match['statut'] != 'Clôturé') {
-        if ($heure_actuelle >= "10:00" && $heure_actuelle <= "17:00") {
-            $votes_ouverts = true;
-        }
+    // On autorise le vote si le match est "En cours" ou "Clôturé"
+    if ($match['statut'] === 'En cours' || $match['statut'] === 'Clôturé') {
+        $votes_ouverts = true;
     }
 
     if (!$votes_ouverts) {
