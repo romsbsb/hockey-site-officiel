@@ -54,10 +54,9 @@ try {
     $reqVotesActuels->execute([$match_actuel['id_match']]);
     $decompte_votes = $reqVotesActuels->fetchAll(PDO::FETCH_KEY_PAIR); // Donne un tableau [id_joueur => nombre_de_votes]
 
-    // 5. Statut des votes (Ouverts si le match est en cours ou terminé)
+   // 5. Statut des votes (Ouverts si le match est en cours ou clôturé)
     $votes_ouverts = false;
     
-    // On ouvre les votes si le match est commencé ou fini
     if ($match_actuel['statut'] == 'En cours' || $match_actuel['statut'] == 'Clôturé') {
         $votes_ouverts = true;
     }
