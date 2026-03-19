@@ -57,11 +57,24 @@ try {
 
     // On accepte les deux actions puisqu'elles font la même chose : vérifier et insérer ou mettre à jour
     if ($action === "vote_motm" || $action === "modifier_motm") {
-        // 1. On cherche si l'utilisateur a déjà voté pour le MOTM de ce match
-        $check = $ConnexionBDD->prepare("SELECT id_vote FROM Votes WHERE id_match = ? AND ip_votant = ? AND note IS NULL");
+        // 1. On cherche dans la table spécifique votes_motm
+        $check = $ConnexionBDD->prepare("SELECT id FROM votes_motm WHERE id_match = ? AND ip_votant = ?");
         $check->execute([$id_match, $ip_votant]);
         $voteExistant = $check->fetch(PDO::FETCH_ASSOC);
 
+        if ($voteExistant) {
+            // L'utilisateur a déjà voté : on MET À JOUR avec le nouveau joueur
+            $update = $ConnexionBDD->prepare("UPDATE votes_motm SET id_joueur = ? WHERE id = ?");
+            $update->execute([$id_joueur, $voteExistant['id']]);
+            
+            echo json_encode(['succes' => true, 'message' => 'Ton vote a été modifié avec succès !']);
+        } else {
+            // Aucun vote trouvé : on CRÉE un nouveau vote
+            $ins = $ConnexionBDD->prepare("INSERT INTO votes_motm (id_match, id_joueur, ip_votant) VALUES (?, ?, ?)");
+            $ins->execute([$id_match, $id_joueur, $ip_votant]);
+            
+            echo json_encode(['succes' => true, 'message' => 'Vote MOTM enregistré !']);
+        }
         if ($voteExistant) {
             // L'utilisateur a déjà voté : on MET À JOUR son vote avec le nouveau joueur
             $update = $ConnexionBDD->prepare("UPDATE Votes SET id_joueur = ? WHERE id_vote = ?");
