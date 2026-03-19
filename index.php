@@ -70,7 +70,7 @@ try {
     $req = $ConnexionBDD->query("SELECT * FROM Joueurs ORDER BY numero ASC");
     $tous_les_joueurs = $req->fetchAll(PDO::FETCH_ASSOC);
 
-    $liste_titulaires = ['Matthias Renouf', 'Xavier Rousselet', 'Robin Mars', 'Kenny Burawudi', 'Timothy (C) Pihouee', 'Alexandre Hardy','Romeo Stab', 'Oscar Lagrange', 'Aurelien.H Hardy', 'Aurelien.B Berne', 'Maxime Lagrange'];
+    $liste_titulaires = ['Matthias Renouf', 'Xavier Rousselet', 'Robin Mars', 'Kenny Burawudi', 'Timothy (C) Pihouee', 'Alexandre Hardy','Romeo Stab', 'Oscar Lagrange', 'Aurélien.H Hardy', 'Aurélien.B Berne', 'Maxime Lagrange'];
     
     $equipe = ['Attaquant' => [], 'Milieu' => [], 'Defenseur' => [], 'Gardien' => []];
     $remplacants = [];
