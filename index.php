@@ -57,7 +57,7 @@ try {
     $votes_ouverts = false;
     $heure_h = $maintenant->format('H:i');
     if ($match_actuel['date_match'] == $maintenant->format('Y-m-d') && $match_actuel['statut'] != 'Clôturé') {
-        if ($heure_h >= "10:00" && $heure_h <= "17:00") {
+        if ($heure_h >= "10:00" && $heure_h <= "16:00") {
             $votes_ouverts = true;
         }
     }

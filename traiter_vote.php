@@ -68,7 +68,7 @@ try {
             $update = $ConnexionBDD->prepare("UPDATE Votes SET id_joueur = ? WHERE id_vote = ?");
             $update->execute([$id_joueur, $voteExistant['id_vote']]);
             
-            echo json_encode(['succes' => true, 'message' => 'Ton vote MOTM a été modifié avec succès !']);
+            echo json_encode(['succes' => true, 'message' => 'Ton vote a été modifié avec succès !']);
         } else {
             // Aucun vote trouvé : on CRÉE un nouveau vote
             $ins = $ConnexionBDD->prepare("INSERT INTO Votes (id_match, id_joueur, ip_votant, note) VALUES (?, ?, ?, NULL)");
