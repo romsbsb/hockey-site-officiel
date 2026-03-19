@@ -54,10 +54,18 @@ try {
     $reqVotesActuels->execute([$match_actuel['id_match']]);
     $decompte_votes = $reqVotesActuels->fetchAll(PDO::FETCH_KEY_PAIR); // Donne un tableau [id_joueur => nombre_de_votes]
 
-   // 5. Statut des votes (Ouverts si le match est en cours ou clôturé)
+   // 5. Statut des votes (Ouverts pendant 4h à partir du coup d'envoi)
     $votes_ouverts = false;
     
-    if ($match_actuel['statut'] == 'En cours' || $match_actuel['statut'] == 'Clôturé') {
+    // On combine la date et l'heure du match en un seul objet
+    $debutMatch = new DateTime($match_actuel['date_match'] . ' ' . $match_actuel['heure_match']);
+    
+    // On calcule l'heure de fin (début + 4 heures)
+    $finVote = clone $debutMatch;
+    $finVote->modify('+4 hours');
+
+    // Si l'heure actuelle est comprise entre le début du match et la fin des 4h
+    if ($maintenant >= $debutMatch && $maintenant <= $finVote) {
         $votes_ouverts = true;
     }
 

@@ -29,7 +29,8 @@ try {
     $ip_votant = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'];
 
     // Vérification de la fenêtre de vote (10h - 17h le jour J, match non clôturé)
-    $reqMatch = $ConnexionBDD->prepare("SELECT date_match, statut FROM Matchs WHERE id_match = ?");
+    // Ajout de "heure_match" dans la requête
+    $reqMatch = $ConnexionBDD->prepare("SELECT date_match, heure_match, statut FROM Matchs WHERE id_match = ?");
     $reqMatch->execute([$id_match]);
     $match = $reqMatch->fetch(PDO::FETCH_ASSOC);
 
@@ -43,13 +44,26 @@ try {
     $date_actuelle = $maintenant->format('Y-m-d');
 
     $votes_ouverts = false;
-    // On autorise le vote si le match est "En cours" ou "Clôturé"
-    if ($match['statut'] === 'En cours' || $match['statut'] === 'Clôturé') {
+    // 5. Statut des votes (Ouverts pendant 4h à partir du coup d'envoi)
+    $votes_ouverts = false;
+    
+    // On combine la date et l'heure du match en un seul objet
+    // Vérification de la fenêtre de vote (4h chrono à partir du match)
+    $debutMatch = new DateTime($match['date_match'] . ' ' . $match['heure_match']);
+    
+    $finVote = clone $debutMatch;
+    $finVote->modify('+4 hours');
+
+    $maintenant = new DateTime();
+    $votes_ouverts = false;
+
+    // Si on est dans le bon créneau horaire
+    if ($maintenant >= $debutMatch && $maintenant <= $finVote) {
         $votes_ouverts = true;
     }
 
     if (!$votes_ouverts) {
-        echo json_encode(['succes' => false, 'message' => 'Les votes ne sont pas ouverts.']);
+        echo json_encode(['succes' => false, 'message' => 'Les votes sont clos (délai de 4h dépassé) ou pas encore ouverts.']);
         exit;
     }
 
