@@ -26,10 +26,10 @@ try {
     $note        = isset($donnees['note']) ? (float)$donnees['note'] : null;
     $commentaire = isset($donnees['commentaire']) ? trim($donnees['commentaire']) : null;
     
-    $ip_votant = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'];
+    // NOUVEAU : On lit le ticket (cookie) du téléphone pour différencier les utilisateurs sur le même Wi-Fi
+    // (Si par hasard le navigateur bloque les cookies, on utilise l'IP en roue de secours)
+    $ip_votant = $_COOKIE['hscsm_voter_id'] ?? $_SERVER['REMOTE_ADDR'];
 
-    // Vérification de la fenêtre de vote (10h - 17h le jour J, match non clôturé)
-    // Ajout de "heure_match" dans la requête
     $reqMatch = $ConnexionBDD->prepare("SELECT date_match, heure_match, statut FROM Matchs WHERE id_match = ?");
     $reqMatch->execute([$id_match]);
     $match = $reqMatch->fetch(PDO::FETCH_ASSOC);
@@ -39,16 +39,7 @@ try {
         exit;
     }
 
-    $maintenant = new DateTime();
-    $heure_actuelle = $maintenant->format('H:i');
-    $date_actuelle = $maintenant->format('Y-m-d');
-
-    $votes_ouverts = false;
-    // 5. Statut des votes (Ouverts pendant 4h à partir du coup d'envoi)
-    $votes_ouverts = false;
-    
-    // On combine la date et l'heure du match en un seul objet
-    // Vérification de la fenêtre de vote (4h chrono à partir du match)
+    // --- Vérification de la fenêtre de vote (4h chrono à partir du match) ---
     $debutMatch = new DateTime($match['date_match'] . ' ' . $match['heure_match']);
     
     $finVote = clone $debutMatch;
@@ -62,6 +53,9 @@ try {
         $votes_ouverts = true;
     }
 
+    // ⚠️ ASTUCE : Décommente la ligne ci-dessous (enlève les //) si tu veux forcer l'ouverture pour tester maintenant !
+    // $votes_ouverts = true; 
+
     if (!$votes_ouverts) {
         echo json_encode(['succes' => false, 'message' => 'Les votes sont clos (délai de 4h dépassé) ou pas encore ouverts.']);
         exit;
@@ -69,7 +63,6 @@ try {
 
     // --- LOGIQUE DE VOTE ET DE MODIFICATION DES VOTES ---
 
-    // On accepte les deux actions puisqu'elles font la même chose : vérifier et insérer ou mettre à jour
     if ($action === "vote_motm" || $action === "modifier_motm") {
         // 1. On cherche dans la table spécifique votes_motm
         $check = $ConnexionBDD->prepare("SELECT id FROM votes_motm WHERE id_match = ? AND ip_votant = ?");
@@ -85,19 +78,6 @@ try {
         } else {
             // Aucun vote trouvé : on CRÉE un nouveau vote
             $ins = $ConnexionBDD->prepare("INSERT INTO votes_motm (id_match, id_joueur, ip_votant) VALUES (?, ?, ?)");
-            $ins->execute([$id_match, $id_joueur, $ip_votant]);
-            
-            echo json_encode(['succes' => true, 'message' => 'Vote MOTM enregistré !']);
-        }
-        if ($voteExistant) {
-            // L'utilisateur a déjà voté : on MET À JOUR son vote avec le nouveau joueur
-            $update = $ConnexionBDD->prepare("UPDATE Votes SET id_joueur = ? WHERE id_vote = ?");
-            $update->execute([$id_joueur, $voteExistant['id_vote']]);
-            
-            echo json_encode(['succes' => true, 'message' => 'Ton vote a été modifié avec succès !']);
-        } else {
-            // Aucun vote trouvé : on CRÉE un nouveau vote
-            $ins = $ConnexionBDD->prepare("INSERT INTO Votes (id_match, id_joueur, ip_votant, note) VALUES (?, ?, ?, NULL)");
             $ins->execute([$id_match, $id_joueur, $ip_votant]);
             
             echo json_encode(['succes' => true, 'message' => 'Vote MOTM enregistré !']);
@@ -126,6 +106,7 @@ try {
     }
 
 } catch (PDOException $e) {
-    echo json_encode(['succes' => false, 'message' => 'Erreur technique.']);
+    // Si la base de données plante, on affiche la VRAIE erreur pour la corriger facilement
+    echo json_encode(['succes' => false, 'message' => 'Erreur BDD : ' . $e->getMessage()]);
 }
 ?>
