@@ -53,6 +53,9 @@ try {
         $votes_ouverts = true;
     }
 
+    // --- MODE TEST : ON FORCE L'OUVERTURE DES VOTES ---
+    $votes_ouverts = true;
+
     // ⚠️ ASTUCE : Décommente la ligne ci-dessous (enlève les //) si tu veux forcer l'ouverture pour tester maintenant !
     // $votes_ouverts = true; 
 
