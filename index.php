@@ -10,7 +10,6 @@ if (!isset($_COOKIE['hscsm_voter_id'])) {
     setcookie('hscsm_voter_id', $voter_id, time() + (86400 * 365), "/");
     $_COOKIE['hscsm_voter_id'] = $voter_id; // On l'active immédiatement pour ce chargement
 }
-
 // --- CONFIGURATION CONNEXION RAILWAY ---
 $serveur = getenv('PGHOST') ?: "127.0.0.1";
 $port    = getenv('PGPORT') ?: "5432";
@@ -79,9 +78,6 @@ try {
     if ($maintenant >= $debutMatch && $maintenant <= $finVote) {
         $votes_ouverts = true;
     }
-
-    // --- MODE TEST : ON FORCE L'OUVERTURE DES VOTES ---
-    $votes_ouverts = true;
 
     // 6. Récupération des votes MOTM pour ce match précis
     $reqMotm = $ConnexionBDD->prepare("SELECT id_joueur, COUNT(*) as nb_votes FROM Votes_MOTM WHERE id_match = ? GROUP BY id_joueur");
