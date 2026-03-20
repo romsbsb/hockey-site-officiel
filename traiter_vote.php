@@ -46,7 +46,7 @@ try {
     $finVote->modify('+4 hours');
 
     $maintenant = new DateTime();
-    $votes_ouverts = false;
+    $votes_ouverts = true;
 
     // Si on est dans le bon créneau horaire
     if ($maintenant >= $debutMatch && $maintenant <= $finVote) {
