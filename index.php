@@ -32,19 +32,58 @@ try {
     $maintenant = new DateTime(); // Heure actuelle
     $match_actuel = null;
 
-    // --- LOGIQUE D'AUTOMATISATION DU STATUT ---
+    // --- LOGIQUE D'AUTOMATISATION DU STATUT ET DISTRIBUTION DU MOTM ---
     foreach ($liste_matchs as &$m) {
         $dateHeureMatch = new DateTime($m['date_match'] . ' ' . $m['heure_match']);
         $clotureTheorique = clone $dateHeureMatch;
         $clotureTheorique->modify('+4 hours');
 
-        // Si l'heure actuelle a dépassé l'heure du match + 4h, on force le statut à 'Clôturé'
-        if ($maintenant > $clotureTheorique) {
+        // 1. Passage au statut "En cours" pendant la fenêtre de 4 heures
+        // On vérifie que le statut n'est pas déjà "En cours" ou "Clôturé" pour ne pas spammer la base de données
+        if ($maintenant >= $dateHeureMatch && $maintenant <= $clotureTheorique && $m['statut'] !== 'En cours' && $m['statut'] !== 'Clôturé') {
+            
+            $updateMatch = $ConnexionBDD->prepare("UPDATE Matchs SET statut = 'En cours' WHERE id_match = ?");
+            $updateMatch->execute([$m['id_match']]);
+            $m['statut'] = 'En cours'; // Mise à jour de l'affichage instantané
+        }
+
+        // 2. Passage au statut "Clôturé" (après les 4 heures) et distribution des points MOTM
+        if ($maintenant > $clotureTheorique && $m['statut'] !== 'Clôturé') {
+            
+            // On verrouille définitivement le match
+            $updateMatch = $ConnexionBDD->prepare("UPDATE Matchs SET statut = 'Clôturé' WHERE id_match = ?");
+            $updateMatch->execute([$m['id_match']]);
             $m['statut'] = 'Clôturé';
+
+            // On calcule qui a gagné en comptant les votes dans votes_motm
+            $reqGagnant = $ConnexionBDD->prepare("
+                SELECT id_joueur, COUNT(*) as nb_votes 
+                FROM votes_motm 
+                WHERE id_match = ? 
+                GROUP BY id_joueur 
+                ORDER BY nb_votes DESC
+            ");
+            $reqGagnant->execute([$m['id_match']]);
+            $resultats = $reqGagnant->fetchAll(PDO::FETCH_ASSOC);
+
+            // On distribue la récompense (+1 au Hall of Fame)
+            if (!empty($resultats)) {
+                $max_votes = $resultats[0]['nb_votes'];
+                
+                $updateJoueur = $ConnexionBDD->prepare("UPDATE Joueurs SET total_motm = total_motm + 1 WHERE id_joueur = ?");
+                
+                // Gestion des égalités : on boucle sur les premiers
+                foreach ($resultats as $res) {
+                    if ($res['nb_votes'] == $max_votes) {
+                        $updateJoueur->execute([$res['id_joueur']]);
+                    } else {
+                        break; // On s'arrête dès qu'un joueur a moins de votes que le maximum
+                    }
+                }
+            }
         }
     }
     unset($m); // Sécurité PHP
-
     // 3. Sélection du match actuel (URL ou Aujourd'hui)
     if (isset($_GET['id_match'])) {
         $id_req = (int)$_GET['id_match'];
