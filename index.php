@@ -104,9 +104,9 @@ try {
     $decompte_votes = $reqVotesActuels->fetchAll(PDO::FETCH_KEY_PAIR); // Donne un tableau [id_joueur => nombre_de_votes]
 
    // 5. Statut des votes (Ouverts pendant 4h à partir du coup d'envoi)
-    $votes_ouverts = true;
+    $votes_ouverts = false;
     
-    /* On combine la date et l'heure du match en un seul objet
+    //On combine la date et l'heure du match en un seul objet
     $debutMatch = new DateTime($match_actuel['date_match'] . ' ' . $match_actuel['heure_match']);
     
     // On calcule l'heure de fin (début + 4 heures)
@@ -117,7 +117,6 @@ try {
     if ($maintenant >= $debutMatch && $maintenant <= $finVote) {
         $votes_ouverts = true;
     }
-        */
 
     // 6. Récupération des votes MOTM pour ce match précis
     $reqMotm = $ConnexionBDD->prepare("SELECT id_joueur, COUNT(*) as nb_votes FROM Votes_MOTM WHERE id_match = ? GROUP BY id_joueur");

@@ -44,7 +44,12 @@ try {
     $finVote = clone $debutMatch;
     $finVote->modify('+4 hours');
     $maintenant = new DateTime();
-$votes_ouverts = true;
+    
+    if ($maintenant < $debutMatch || $maintenant > $finVote) {
+        echo json_encode(['succes' => false, 'message' => 'Les votes sont clos (délai de 4h dépassé) ou pas encore ouverts.']);
+        exit;
+    }
+
 
     // --- LOGIQUE DE VOTE ET DE MODIFICATION DES VOTES ---
 
