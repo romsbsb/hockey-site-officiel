@@ -65,7 +65,7 @@ try {
     $decompte_votes = $reqVotesActuels->fetchAll(PDO::FETCH_KEY_PAIR); // Donne un tableau [id_joueur => nombre_de_votes]
 
    // 5. Statut des votes (Ouverts pendant 4h à partir du coup d'envoi)
-    $votes_ouverts = false;
+    $votes_ouverts = true;
     
     // On combine la date et l'heure du match en un seul objet
     $debutMatch = new DateTime($match_actuel['date_match'] . ' ' . $match_actuel['heure_match']);
