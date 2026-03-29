@@ -155,143 +155,87 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homme du Match | HSCSM</title>
-    <style>
-        body { font-family: sans-serif; background-color: #1a1a1a; color: white; margin: 0; text-align: center; padding-bottom: 50px; }
-        header { background-color: #0A5C36; padding: 15px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .match-selector select { padding: 8px; border-radius: 20px; font-weight: bold; background: white; }
-        .layout { display: flex; flex-wrap: wrap-reverse; justify-content: center; align-items: flex-start; gap: 20px; max-width: 1200px; margin: 20px auto; padding: 0 10px; }
-        
-        /* Terrain Hockey */
-        .terrain { 
-            background-color: #2e8b57; 
-            flex: 2; 
-            min-width: 320px; 
-            max-width: 500px; 
-            border: 3px solid white; 
-            border-radius: 10px; 
-            position: relative; 
-            padding: 20px 0; 
-            min-height: 750px; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: space-around; 
-            overflow: hidden;
-        }
-        .ligne-23m { position: absolute; width: 100%; height: 1px; border-top: 2px dashed rgba(255,255,255,0.6); z-index: 1; }
-        .top-23 { top: 25%; }
-        .bottom-23 { bottom: 25%; }
-        .ligne-mediane { position: absolute; top: 50%; width: 100%; height: 2px; background: rgba(255,255,255,0.8); z-index: 1; }
-        .cercle-tir { position: absolute; left: 50%; transform: translateX(-50%); width: 240px; height: 120px; border: 2px solid white; z-index: 0; }
-        .top-cercle { top: -2px; border-radius: 0 0 120px 120px; }
-        .bottom-cercle { bottom: -2px; border-radius: 120px 120px 0 0; }
-        .cercle-central { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border: 2px solid rgba(255,255,255,0.6); border-radius: 50%; z-index: 1; }
+   <style>
+    /* --- BASES & LAYOUT --- */
+    body { font-family: sans-serif; background-color: #1a1a1a; color: white; margin: 0; text-align: center; padding-bottom: 50px; }
+    header { background-color: #0A5C36; padding: 15px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+    .match-selector select { padding: 8px; border-radius: 20px; font-weight: bold; background: white; }
+    .layout { display: flex; flex-wrap: wrap-reverse; justify-content: center; align-items: flex-start; gap: 20px; max-width: 1200px; margin: 20px auto; padding: 0 10px; }
+    
+    /* --- TERRAIN HOCKEY --- */
+    .terrain { 
+        background-color: #2e8b57; flex: 2; min-width: 320px; max-width: 500px; 
+        border: 3px solid white; border-radius: 10px; position: relative; 
+        padding: 20px 0; min-height: 750px; display: flex; 
+        flex-direction: column; justify-content: space-around; overflow: hidden;
+    }
+    .ligne-23m { position: absolute; width: 100%; height: 1px; border-top: 2px dashed rgba(255,255,255,0.6); z-index: 1; }
+    .top-23 { top: 25%; }
+    .bottom-23 { bottom: 25%; }
+    .ligne-mediane { position: absolute; top: 50%; width: 100%; height: 2px; background: rgba(255,255,255,0.8); z-index: 1; }
+    .cercle-tir { position: absolute; left: 50%; transform: translateX(-50%); width: 240px; height: 120px; border: 2px solid white; z-index: 0; }
+    .top-cercle { top: -2px; border-radius: 0 0 120px 120px; }
+    .bottom-cercle { bottom: -2px; border-radius: 120px 120px 0 0; }
+    .cercle-central { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border: 2px solid rgba(255,255,255,0.6); border-radius: 50%; z-index: 1; }
 
-        .banc { background: #2a2a2a; width: 120px; border: 2px dashed #555; border-radius: 10px; padding: 10px; }
-        .panneau-motm { background: #2a2a2a; width: 220px; padding: 15px; border-radius: 10px; border: 2px solid #FFD700; }
-        .star-rating {
-    display: inline-block;
-    font-size: 0.8rem;
-    color: #444; /* Étoiles vides */
-    position: relative;
-}
-.star-rating::before {
-    content: '★★★★★';
-    letter-spacing: 1px;
-}
-.star-rating-fill {
-    color: #FFD700; /* Étoiles pleines */
-    position: absolute;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-    white-space: nowrap;
-}
-.star-rating-fill::before {
-    content: '★★★★★';
-    letter-spacing: 1px;
-}
-.rating-group {
-    display: inline-flex;
-    flex-direction: row-reverse;
-    justify-content: center;
-}
+    /* --- PANNEAUX LATERAUX --- */
+    .banc { background: #2a2a2a; width: 120px; border: 2px dashed #555; border-radius: 10px; padding: 10px; }
+    .panneau-motm { background: #2a2a2a; width: 220px; padding: 15px; border-radius: 10px; border: 2px solid #FFD700; }
 
-.rating-group input { display: none; }
+    /* --- SYSTEME D'ÉTOILES (AFFICHAGE STATIQUE SUR TERRAIN) --- */
+    .star-rating { display: inline-block; font-size: 0.8rem; color: #444; position: relative; }
+    .star-rating::before { content: '★★★★★'; letter-spacing: 1px; }
+    .star-rating-fill { color: #FFD700; position: absolute; top: 0; left: 0; overflow: hidden; white-space: nowrap; }
+    .star-rating-fill::before { content: '★★★★★'; letter-spacing: 1px; }
 
-.rating-group label {
-    cursor: pointer;
-    position: relative;
-    width: 20px;  /* Largeur fixe d'une demi-étoile */
-    height: 40px;
-    font-size: 40px;
-    line-height: 40px;
-    color: #444; /* Couleur vide */
-    overflow: hidden; /* Coupe tout ce qui dépasse */
-}
+    /* --- SYSTEME DE NOTATION (MODAL CLIQUEABLE) --- */
+    .rating-group { display: inline-flex; flex-direction: row-reverse; justify-content: center; padding: 10px 0; }
+    .rating-group input { display: none !important; }
+    .rating-group label {
+        cursor: pointer; position: relative; width: 20px; height: 40px; 
+        font-size: 40px; line-height: 40px; color: #444; overflow: hidden;
+    }
+    .rating-group label::before { content: '★'; position: absolute; top: 0; width: 40px; }
+    .rating-group label.half::before { left: 0; }
+    .rating-group label.full::before { left: -20px; }
+    .rating-group label.full { margin-right: 5px; }
 
-/* L'étoile est placée de manière identique pour les deux moitiés */
-.rating-group label::before {
-    content: '★';
-    position: absolute;
-    top: 0;
-}
+    /* Animation de sélection dorée */
+    .rating-group input:checked ~ label,
+    .rating-group label:hover,
+    .rating-group label:hover ~ label { color: #FFD700 !important; }
 
-/* Pour la moitié GAUCHE (0.5, 1.5...) : l'étoile est calée à gauche */
-.rating-group label.half::before {
-    left: 0;
-}
+    /* --- CARTES JOUEURS --- */
+    .ligne-joueurs { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; z-index: 2; }
+    .player-card { background: white; color: #333; border-radius: 12px; padding: 5px; width: 90px; cursor: pointer; position: relative; margin-bottom: 15px; transition: transform 0.2s; }
+    .player-card:hover { transform: scale(1.05); }
+    .player-photo { width: 60px; height: 60px; background: #ddd; border-radius: 50%; border: 2px solid #0A5C36; margin: 0 auto 5px auto; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+    .player-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .player-number { position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; font-size: 0.7rem; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid white; }
+    .player-rating { position: absolute; top: -5px; left: -5px; background: #FFD700; color: #000; font-size: 0.7rem; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid #333; }
+    .player-name { font-size: 0.65rem; font-weight: bold; text-transform: uppercase; }
 
-/* Pour la moitié DROITE (1.0, 2.0...) : on décale l'étoile de 20px vers la gauche */
-/* Ainsi, seule sa partie droite est visible dans la fenêtre de 20px du label */
-.rating-group label.full::before {
-    left: -20px;
-}
+    /* --- BADGES & BOUTONS --- */
+    .badge-votes { position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); background: #17a2b8; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 8px; z-index: 10; white-space: nowrap; border: 1px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);}
+    .badge-motm-winner { position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); background: #FFD700; color: #000; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 8px; z-index: 10; white-space: nowrap; border: 1px solid #333; box-shadow: 0 2px 4px rgba(0,0,0,0.5); animation: pulse 1.5s infinite;}
 
-/* On ajoute un petit espace entre les étoiles complètes */
-.rating-group label.full {
-    margin-right: 6px;
-}
+    @keyframes pulse {
+        0% { transform: translateX(-50%) scale(1); }
+        50% { transform: translateX(-50%) scale(1.1); }
+        100% { transform: translateX(-50%) scale(1); }
+    }
 
-/* Effet de couleur au survol et sélection */
-.rating-group input:checked ~ label,
-.rating-group label:hover,
-.rating-group label:hover ~ label {
-    color: #FFD700;
-}
-        .ligne-joueurs { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; z-index: 2; }
-        /* Ajout d'une marge en bas pour laisser la place aux badges de votes */
-        .player-card { background: white; color: #333; border-radius: 12px; padding: 5px; width: 90px; cursor: pointer; position: relative; margin-bottom: 15px; transition: transform 0.2s; }
-        .player-card:hover { transform: scale(1.05); }
-        .player-photo { width: 60px; height: 60px; background: #ddd; border-radius: 50%; border: 2px solid #0A5C36; margin: 0 auto 5px auto; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
-        .player-photo img { width: 100%; height: 100%; object-fit: cover; }
-        .player-number { position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; font-size: 0.7rem; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid white; }
-        .player-rating { position: absolute; top: -5px; left: -5px; background: #FFD700; color: #000; font-size: 0.7rem; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid #333; }
-        .player-name { font-size: 0.65rem; font-weight: bold; text-transform: uppercase; }
+    .btn-motm { background: #FFD700; color: black; border: none; padding: 10px; width: 100%; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    .btn-motm:disabled { background: #555; color: #888; cursor: not-allowed; }
+    .btn-modifier { background: #17a2b8; color: white; border: 1px solid #117a8b; margin-top: 5px; }
+    .btn-modifier:disabled { background: #555; color: #888; border: none; }
 
-        /* Nouveaux styles pour les badges MOTM */
-        .badge-votes { position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); background: #17a2b8; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 8px; z-index: 10; white-space: nowrap; border: 1px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);}
-        .badge-motm-winner { position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); background: #FFD700; color: #000; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 8px; z-index: 10; white-space: nowrap; border: 1px solid #333; box-shadow: 0 2px 4px rgba(0,0,0,0.5); animation: pulse 1.5s infinite;}
-
-        @keyframes pulse {
-            0% { transform: translateX(-50%) scale(1); }
-            50% { transform: translateX(-50%) scale(1.1); }
-            100% { transform: translateX(-50%) scale(1); }
-        }
-
-        .btn-motm { background: #FFD700; color: black; border: none; padding: 10px; width: 100%; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        .btn-motm:disabled { background: #555; color: #888; cursor: not-allowed; }
-        
-        /* Style pour le bouton Modifier */
-        .btn-modifier { background: #17a2b8; color: white; border: 1px solid #117a8b; margin-top: 5px; }
-        .btn-modifier:disabled { background: #555; color: #888; border: none; }
-
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-        .modal-content { background: #222; margin: 15% auto; padding: 20px; border-radius: 10px; width: 280px; }
-        .stars { color: #555; font-size: 2rem; cursor: pointer; margin: 10px 0; }
-        .star.active { color: #FFD700; }
-        textarea { width: 90%; margin-top: 10px; padding: 5px; background: #333; color: white; border: 1px solid #555; }
-        #confirmation-msg { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #28a745; color: white; padding: 15px 25px; border-radius: 30px; z-index: 2000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-    </style>
+    /* --- MODAL & MISC --- */
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+    .modal-content { background: #222; margin: 15% auto; padding: 20px; border-radius: 10px; width: 280px; }
+    textarea { width: 90%; margin-top: 10px; padding: 5px; background: #333; color: white; border: 1px solid #555; border-radius: 4px; }
+    #confirmation-msg { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #28a745; color: white; padding: 15px 25px; border-radius: 30px; z-index: 2000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+</style>
 </head>
 <body>
 
