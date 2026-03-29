@@ -213,7 +213,7 @@ try {
 .rating-group {
     display: inline-flex;
     flex-direction: row-reverse;
-    font-size: 40px; /* Taille de la grosse étoile */
+    justify-content: center;
 }
 
 .rating-group input { display: none; }
@@ -221,37 +221,38 @@ try {
 .rating-group label {
     cursor: pointer;
     position: relative;
-    width: 20px; /* Largeur d'une demi-étoile (40px / 2) */
+    width: 20px;  /* Largeur fixe d'une demi-étoile */
     height: 40px;
-    color: #444;
+    font-size: 40px;
+    line-height: 40px;
+    color: #444; /* Couleur vide */
+    overflow: hidden; /* Coupe tout ce qui dépasse */
 }
 
-/* L'étoile de fond (vide) */
+/* L'étoile est placée de manière identique pour les deux moitiés */
 .rating-group label::before {
     content: '★';
     position: absolute;
+    top: 0;
+}
+
+/* Pour la moitié GAUCHE (0.5, 1.5...) : l'étoile est calée à gauche */
+.rating-group label.half::before {
     left: 0;
 }
 
-/* Pour la moitié droite, on cache la partie gauche du caractère */
+/* Pour la moitié DROITE (1.0, 2.0...) : on décale l'étoile de 20px vers la gauche */
+/* Ainsi, seule sa partie droite est visible dans la fenêtre de 20px du label */
 .rating-group label.full::before {
-    text-indent: -20px; /* On décale le texte vers la gauche */
-    width: 20px;
-    overflow: hidden;
+    left: -20px;
 }
 
-/* Pour la moitié gauche, on affiche juste la moitié du caractère */
-.rating-group label.half::before {
-    width: 20px;
-    overflow: hidden;
-}
-
-/* ESPACEMENT : On ajoute une marge seulement après chaque étoile complète */
+/* On ajoute un petit espace entre les étoiles complètes */
 .rating-group label.full {
-    margin-right: 10px;
+    margin-right: 6px;
 }
 
-/* COULEUR : Quand on survole ou coche */
+/* Effet de couleur au survol et sélection */
 .rating-group input:checked ~ label,
 .rating-group label:hover,
 .rating-group label:hover ~ label {
@@ -438,20 +439,30 @@ try {
         <h2 id="modal-nom-joueur" style="margin-bottom:10px;">Joueur</h2>
         
         <div class="rating-group">
-    <input type="radio" id="st5" name="note_radio" value="5"><label for="st5" class="full"></label>
-    <input type="radio" id="st45" name="note_radio" value="4.5"><label for="st45" class="half"></label>
-    
-    <input type="radio" id="st4" name="note_radio" value="4"><label for="st4" class="full"></label>
-    <input type="radio" id="st35" name="note_radio" value="3.5"><label for="st35" class="half"></label>
-    
-    <input type="radio" id="st3" name="note_radio" value="3"><label for="st3" class="full"></label>
-    <input type="radio" id="st25" name="note_radio" value="2.5"><label for="st25" class="half"></label>
-    
-    <input type="radio" id="st2" name="note_radio" value="2"><label for="st2" class="full"></label>
-    <input type="radio" id="st15" name="note_radio" value="1.5"><label for="st15" class="half"></label>
-    
-    <input type="radio" id="st1" name="note_radio" value="1"><label for="st1" class="full"></label>
-    <input type="radio" id="st05" name="note_radio" value="0.5"><label for="st05" class="half"></label>
+    <input type="radio" id="st5" name="note_radio" value="5">
+    <label for="st5" class="full"></label>
+    <input type="radio" id="st45" name="note_radio" value="4.5">
+    <label for="st45" class="half"></label>
+
+    <input type="radio" id="st4" name="note_radio" value="4">
+    <label for="st4" class="full"></label>
+    <input type="radio" id="st35" name="note_radio" value="3.5">
+    <label for="st35" class="half"></label>
+
+    <input type="radio" id="st3" name="note_radio" value="3">
+    <label for="st3" class="full"></label>
+    <input type="radio" id="st25" name="note_radio" value="2.5">
+    <label for="st25" class="half"></label>
+
+    <input type="radio" id="st2" name="note_radio" value="2">
+    <label for="st2" class="full"></label>
+    <input type="radio" id="st15" name="note_radio" value="1.5">
+    <label for="st15" class="half"></label>
+
+    <input type="radio" id="st1" name="note_radio" value="1">
+    <label for="st1" class="full"></label>
+    <input type="radio" id="st05" name="note_radio" value="0.5">
+    <label for="st05" class="half"></label>
 </div>
 
         <textarea id="commentaire-performance" placeholder="Commentaire (optionnel)" style="width:100%; box-sizing:border-box;"></textarea>
