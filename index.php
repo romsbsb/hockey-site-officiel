@@ -211,6 +211,46 @@ try {
     content: '★★★★★';
     letter-spacing: 1px;
 }
+/* Système de notation par demi-étoiles */
+.rating-group {
+    display: inline-flex;
+    flex-direction: row-reverse; /* Important pour le sélecteur CSS ~ */
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.rating-group input { display: none; }
+
+.rating-group label {
+    cursor: pointer;
+    width: 18px; /* Largeur d'une demi-étoile */
+    height: 36px;
+    font-size: 32px;
+    color: #444;
+    position: relative;
+    overflow: hidden;
+    line-height: 36px;
+}
+
+.rating-group label::before {
+    content: '★';
+    position: absolute;
+    left: 0;
+}
+
+/* On ne montre que la moitié gauche de l'étoile */
+.rating-group label.half::before { width: 50%; }
+
+/* On décale l'étoile vers la gauche pour ne montrer que la moitié droite */
+.rating-group label.full::before { left: -50%; } 
+.rating-group label.full { width: 18px; margin-right: 5px; }
+
+/* Coloration au survol et quand coché */
+.rating-group input:checked ~ label,
+.rating-group label:hover,
+.rating-group label:hover ~ label {
+    color: #FFD700;
+}
         
         .ligne-joueurs { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; z-index: 2; }
         /* Ajout d'une marge en bas pour laisser la place aux badges de votes */
@@ -390,20 +430,27 @@ try {
 
 <div id="modalNotation" class="modal">
     <div class="modal-content">
-        <h2 id="modal-nom-joueur">Joueur</h2>
-        <div class="stars" id="star-container">
-            <span class="star" data-value="1">★</span>
-            <span class="star" data-value="2">★</span>
-            <span class="star" data-value="3">★</span>
-            <span class="star" data-value="4">★</span>
-            <span class="star" data-value="5">★</span>
+        <h2 id="modal-nom-joueur" style="margin-bottom:10px;">Joueur</h2>
+        
+        <div class="rating-group">
+            <input type="radio" id="st5" name="note_radio" value="5"><label for="st5" class="full"></label>
+            <input type="radio" id="st45" name="note_radio" value="4.5"><label for="st45" class="half"></label>
+            <input type="radio" id="st4" name="note_radio" value="4"><label for="st4" class="full"></label>
+            <input type="radio" id="st35" name="note_radio" value="3.5"><label for="st35" class="half"></label>
+            <input type="radio" id="st3" name="note_radio" value="3"><label for="st3" class="full"></label>
+            <input type="radio" id="st25" name="note_radio" value="2.5"><label for="st25" class="half"></label>
+            <input type="radio" id="st2" name="note_radio" value="2"><label for="st2" class="full"></label>
+            <input type="radio" id="st15" name="note_radio" value="1.5"><label for="st15" class="half"></label>
+            <input type="radio" id="st1" name="note_radio" value="1"><label for="st1" class="full"></label>
+            <input type="radio" id="st05" name="note_radio" value="0.5"><label for="st05" class="half"></label>
         </div>
-        <textarea id="commentaire-performance" placeholder="Commentaire (optionnel)"></textarea>
+
+        <textarea id="commentaire-performance" placeholder="Commentaire (optionnel)" style="width:100%; box-sizing:border-box;"></textarea>
+        
         <button class="btn-motm" onclick="enregistrerNote()">ENREGISTRER</button>
         <button onclick="fermerModal()" style="background:none; border:none; color:#aaa; cursor:pointer; margin-top:10px;">Annuler</button>
     </div>
 </div>
-
 <div id="confirmation-msg"></div>
 
 <script>
@@ -428,15 +475,26 @@ document.querySelectorAll('.star').forEach(star => {
     }
 });
 
+// Remplacez vos fonctions existantes par celles-ci :
 function resetStars() {
-    noteVal = 0;
-    document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+    // Décoche tous les boutons radio
+    document.querySelectorAll('input[name="note_radio"]').forEach(radio => radio.checked = false);
     document.getElementById('commentaire-performance').value = "";
 }
 
 function enregistrerNote() {
-    if(noteVal == 0) { alert("Sélectionne une note !"); return; }
-    envoyerAction(joueurId, "noter", noteVal, document.getElementById('commentaire-performance').value);
+    // On récupère le bouton radio coché
+    const selected = document.querySelector('input[name="note_radio"]:checked');
+    
+    if(!selected) { 
+        alert("Sélectionne une note !"); 
+        return; 
+    }
+    
+    const noteVal = selected.value; // ex: "4.5"
+    const commentaire = document.getElementById('commentaire-performance').value;
+    
+    envoyerAction(joueurId, "noter", noteVal, commentaire);
     fermerModal();
 }
 
