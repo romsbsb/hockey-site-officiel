@@ -214,42 +214,57 @@ try {
 /* Système de notation par demi-étoiles */
 .rating-group {
     display: inline-flex;
-    flex-direction: row-reverse; /* Important pour le sélecteur CSS ~ */
+    flex-direction: row-reverse;
     justify-content: center;
-    padding: 10px 0;
+    background: #222; /* Pour mieux voir les étoiles sur fond sombre */
+    padding: 15px;
+    border-radius: 8px;
 }
 
 .rating-group input { display: none; }
 
 .rating-group label {
     cursor: pointer;
-    width: 18px; /* Largeur d'une demi-étoile */
-    height: 36px;
-    font-size: 32px;
-    color: #444;
+    width: 15px;      /* Largeur exacte d'une demi-étoile */
+    height: 30px;
+    font-size: 28px;
+    color: #444;      /* Couleur grise des étoiles vides */
     position: relative;
-    overflow: hidden;
-    line-height: 36px;
+    line-height: 30px;
+    transition: color 0.2s ease-in-out;
 }
 
+/* On utilise l'étoile pleine Unicode */
 .rating-group label::before {
     content: '★';
     position: absolute;
     left: 0;
 }
 
-/* On ne montre que la moitié gauche de l'étoile */
-.rating-group label.half::before { width: 50%; }
+/* Moitié GAUCHE de l'étoile */
+.rating-group label.half::before {
+    width: 50%;
+    overflow: hidden;
+}
 
-/* On décale l'étoile vers la gauche pour ne montrer que la moitié droite */
-.rating-group label.full::before { left: -50%; } 
-.rating-group label.full { width: 18px; margin-right: 5px; }
+/* Moitié DROITE de l'étoile */
+.rating-group label.full::before {
+    /* On décale l'étoile vers la gauche pour n'afficher que la partie droite */
+    margin-left: -50%; 
+    width: 100%;
+}
 
-/* Coloration au survol et quand coché */
+/* Ajustement de la marge pour coller les deux moitiés */
+.rating-group label.full {
+    margin-right: 8px; /* Espace entre chaque étoile complète */
+}
+
+/* Couleur Or au survol et sélection */
 .rating-group input:checked ~ label,
 .rating-group label:hover,
 .rating-group label:hover ~ label {
     color: #FFD700;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
 }
         
         .ligne-joueurs { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; z-index: 2; }
