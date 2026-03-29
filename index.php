@@ -190,17 +190,16 @@ try {
         .panneau-motm { background: #2a2a2a; width: 220px; padding: 15px; border-radius: 10px; border: 2px solid #FFD700; }
         .star-rating {
     display: inline-block;
-    font-size: 0.8rem; /* Taille des étoiles */
-    color: #555; /* Couleur des étoiles vides (gris) */
+    font-size: 0.8rem;
+    color: #444; /* Étoiles vides */
     position: relative;
-    margin-top: 3px;
 }
 .star-rating::before {
     content: '★★★★★';
     letter-spacing: 1px;
 }
 .star-rating-fill {
-    color: #FFD700; /* Couleur des étoiles pleines (or) */
+    color: #FFD700; /* Étoiles pleines */
     position: absolute;
     top: 0;
     left: 0;
@@ -211,62 +210,53 @@ try {
     content: '★★★★★';
     letter-spacing: 1px;
 }
-/* Système de notation par demi-étoiles */
 .rating-group {
     display: inline-flex;
     flex-direction: row-reverse;
-    justify-content: center;
-    background: #222; /* Pour mieux voir les étoiles sur fond sombre */
-    padding: 15px;
-    border-radius: 8px;
+    font-size: 40px; /* Taille de la grosse étoile */
 }
 
 .rating-group input { display: none; }
 
 .rating-group label {
     cursor: pointer;
-    width: 15px;      /* Largeur exacte d'une demi-étoile */
-    height: 30px;
-    font-size: 28px;
-    color: #444;      /* Couleur grise des étoiles vides */
     position: relative;
-    line-height: 30px;
-    transition: color 0.2s ease-in-out;
+    width: 20px; /* Largeur d'une demi-étoile (40px / 2) */
+    height: 40px;
+    color: #444;
 }
 
-/* On utilise l'étoile pleine Unicode */
+/* L'étoile de fond (vide) */
 .rating-group label::before {
     content: '★';
     position: absolute;
     left: 0;
 }
 
-/* Moitié GAUCHE de l'étoile */
-.rating-group label.half::before {
-    width: 50%;
+/* Pour la moitié droite, on cache la partie gauche du caractère */
+.rating-group label.full::before {
+    text-indent: -20px; /* On décale le texte vers la gauche */
+    width: 20px;
     overflow: hidden;
 }
 
-/* Moitié DROITE de l'étoile */
-.rating-group label.full::before {
-    /* On décale l'étoile vers la gauche pour n'afficher que la partie droite */
-    margin-left: -50%; 
-    width: 100%;
+/* Pour la moitié gauche, on affiche juste la moitié du caractère */
+.rating-group label.half::before {
+    width: 20px;
+    overflow: hidden;
 }
 
-/* Ajustement de la marge pour coller les deux moitiés */
+/* ESPACEMENT : On ajoute une marge seulement après chaque étoile complète */
 .rating-group label.full {
-    margin-right: 8px; /* Espace entre chaque étoile complète */
+    margin-right: 10px;
 }
 
-/* Couleur Or au survol et sélection */
+/* COULEUR : Quand on survole ou coche */
 .rating-group input:checked ~ label,
 .rating-group label:hover,
 .rating-group label:hover ~ label {
     color: #FFD700;
-    text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
 }
-        
         .ligne-joueurs { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; z-index: 2; }
         /* Ajout d'une marge en bas pour laisser la place aux badges de votes */
         .player-card { background: white; color: #333; border-radius: 12px; padding: 5px; width: 90px; cursor: pointer; position: relative; margin-bottom: 15px; transition: transform 0.2s; }
@@ -448,17 +438,21 @@ try {
         <h2 id="modal-nom-joueur" style="margin-bottom:10px;">Joueur</h2>
         
         <div class="rating-group">
-            <input type="radio" id="st5" name="note_radio" value="5"><label for="st5" class="full"></label>
-            <input type="radio" id="st45" name="note_radio" value="4.5"><label for="st45" class="half"></label>
-            <input type="radio" id="st4" name="note_radio" value="4"><label for="st4" class="full"></label>
-            <input type="radio" id="st35" name="note_radio" value="3.5"><label for="st35" class="half"></label>
-            <input type="radio" id="st3" name="note_radio" value="3"><label for="st3" class="full"></label>
-            <input type="radio" id="st25" name="note_radio" value="2.5"><label for="st25" class="half"></label>
-            <input type="radio" id="st2" name="note_radio" value="2"><label for="st2" class="full"></label>
-            <input type="radio" id="st15" name="note_radio" value="1.5"><label for="st15" class="half"></label>
-            <input type="radio" id="st1" name="note_radio" value="1"><label for="st1" class="full"></label>
-            <input type="radio" id="st05" name="note_radio" value="0.5"><label for="st05" class="half"></label>
-        </div>
+    <input type="radio" id="st5" name="note_radio" value="5"><label for="st5" class="full"></label>
+    <input type="radio" id="st45" name="note_radio" value="4.5"><label for="st45" class="half"></label>
+    
+    <input type="radio" id="st4" name="note_radio" value="4"><label for="st4" class="full"></label>
+    <input type="radio" id="st35" name="note_radio" value="3.5"><label for="st35" class="half"></label>
+    
+    <input type="radio" id="st3" name="note_radio" value="3"><label for="st3" class="full"></label>
+    <input type="radio" id="st25" name="note_radio" value="2.5"><label for="st25" class="half"></label>
+    
+    <input type="radio" id="st2" name="note_radio" value="2"><label for="st2" class="full"></label>
+    <input type="radio" id="st15" name="note_radio" value="1.5"><label for="st15" class="half"></label>
+    
+    <input type="radio" id="st1" name="note_radio" value="1"><label for="st1" class="full"></label>
+    <input type="radio" id="st05" name="note_radio" value="0.5"><label for="st05" class="half"></label>
+</div>
 
         <textarea id="commentaire-performance" placeholder="Commentaire (optionnel)" style="width:100%; box-sizing:border-box;"></textarea>
         
