@@ -196,8 +196,15 @@ try {
         font-size: 40px; line-height: 40px; color: #444; overflow: hidden;
     }
     .rating-group label::before { content: '★'; position: absolute; top: 0; width: 40px; }
-    .rating-group label.half::before { left: 0; }
-    .rating-group label.full::before { left: -20px; }
+    /* Fenêtre pour la moitié GAUCHE (0.5, 1.5...) */
+.rating-group label.half::before {
+    left: 1px; /* Ajuste cette valeur (ex: 1px ou 2px) pour centrer la moitié gauche */
+}
+
+/* Fenêtre pour la moitié DROITE (1.0, 2.0...) */
+.rating-group label.full::before {
+    left: -21px; /* Ajuste ici aussi (ex: -19px ou -21px) pour caler la moitié droite */
+}
     .rating-group label.full { margin-right: 5px; }
 
     /* Animation de sélection dorée */
